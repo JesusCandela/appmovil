@@ -1,0 +1,90 @@
+Flutter crash report.
+Please report a bug at https://github.com/flutter/flutter/issues.
+
+## command
+
+flutter pub get
+
+## exception
+
+FileSystemException: FileSystemException: Cannot open file, path = 'C:\Users\DELL\OneDrive\Escritorio\Tesis\apptour\apptour\ios\Runner\GeneratedPluginRegistrant.m' (OS Error: El proceso no tiene acceso al archivo porque está siendo utilizado por otro proceso.
+, errno = 32)
+
+```
+#0      _File.throwIfError (dart:io/file_impl.dart:635:7)
+#1      _File.openSync (dart:io/file_impl.dart:479:5)
+#2      _File.writeAsBytesSync (dart:io/file_impl.dart:604:31)
+#3      _File.writeAsStringSync (dart:io/file_impl.dart:628:5)
+#4      ForwardingFile.writeAsStringSync (package:file/src/forwarding/forwarding_file.dart:147:16)
+#5      ErrorHandlingFile.writeAsStringSync.<anonymous closure> (package:flutter_tools/src/base/error_handling_io.dart:271:22)
+#6      _runSync (package:flutter_tools/src/base/error_handling_io.dart:597:14)
+#7      ErrorHandlingFile.writeAsStringSync (package:flutter_tools/src/base/error_handling_io.dart:270:5)
+#8      _renderTemplateToFile (package:flutter_tools/src/flutter_plugins.dart:32:8)
+#9      _writeIOSPluginRegistrant (package:flutter_tools/src/flutter_plugins.dart:775:3)
+#10     injectPlugins (package:flutter_tools/src/flutter_plugins.dart:1085:11)
+<asynchronous suspension>
+#11     FlutterProject.ensureReadyForPlatformSpecificTooling (package:flutter_tools/src/project.dart:335:5)
+<asynchronous suspension>
+#12     PackagesGetCommand.runCommand (package:flutter_tools/src/commands/packages.dart:177:5)
+<asynchronous suspension>
+#13     FlutterCommand.run.<anonymous closure> (package:flutter_tools/src/runner/flutter_command.dart:1140:27)
+<asynchronous suspension>
+#14     AppContext.run.<anonymous closure> (package:flutter_tools/src/base/context.dart:150:19)
+<asynchronous suspension>
+#15     CommandRunner.runCommand (package:args/command_runner.dart:209:13)
+<asynchronous suspension>
+#16     FlutterCommandRunner.runCommand.<anonymous closure> (package:flutter_tools/src/runner/flutter_command_runner.dart:288:9)
+<asynchronous suspension>
+#17     AppContext.run.<anonymous closure> (package:flutter_tools/src/base/context.dart:150:19)
+<asynchronous suspension>
+#18     FlutterCommandRunner.runCommand (package:flutter_tools/src/runner/flutter_command_runner.dart:236:5)
+<asynchronous suspension>
+#19     run.<anonymous closure>.<anonymous closure> (package:flutter_tools/runner.dart:62:9)
+<asynchronous suspension>
+#20     AppContext.run.<anonymous closure> (package:flutter_tools/src/base/context.dart:150:19)
+<asynchronous suspension>
+#21     main (package:flutter_tools/executable.dart:94:3)
+<asynchronous suspension>
+```
+
+## flutter doctor
+
+```
+[✓] Flutter (Channel stable, 2.8.0, on Microsoft Windows [VersiÃ³n 10.0.19044.1889], locale es-ES)
+    • Flutter version 2.8.0 at C:\src\flutter
+    • Upstream repository https://github.com/flutter/flutter.git
+    • Framework revision cf44000065 (10 months ago), 2021-12-08 14:06:50 -0800
+    • Engine revision 40a99c5951
+    • Dart version 2.15.0
+
+[!] Android toolchain - develop for Android devices (Android SDK version 33.0.0)
+    • Android SDK at C:\Users\DELL\AppData\Local\Android\sdk
+    ✗ cmdline-tools component is missing
+      Run `path/to/sdkmanager --install "cmdline-tools;latest"`
+      See https://developer.android.com/studio/command-line for more details.
+    ✗ Android license status unknown.
+      Run `flutter doctor --android-licenses` to accept the SDK licenses.
+      See https://flutter.dev/docs/get-started/install/windows#android-setup for more details.
+
+[✓] Chrome - develop for the web
+    • Chrome at C:\Program Files\Google\Chrome\Application\chrome.exe
+
+[✓] Android Studio (version 2021.1)
+    • Android Studio at C:\Program Files\Android\Android Studio
+    • Flutter plugin can be installed from:
+      🔨 https://plugins.jetbrains.com/plugin/9212-flutter
+    • Dart plugin can be installed from:
+      🔨 https://plugins.jetbrains.com/plugin/6351-dart
+    • Java version OpenJDK Runtime Environment (build 11.0.11+9-b60-7590822)
+
+[✓] VS Code (version 1.70.2)
+    • VS Code at C:\Users\DELL\AppData\Local\Programs\Microsoft VS Code
+    • Flutter extension version 3.48.0
+
+[✓] Connected device (3 available)
+    • Android SDK built for x86 (mobile) • emulator-5554 • android-x86    • Android 11 (API 30) (emulator)
+    • Chrome (web)                       • chrome        • web-javascript • Google Chrome 105.0.5195.127
+    • Edge (web)                         • edge          • web-javascript • Microsoft Edge 105.0.1343.33
+
+! Doctor found issues in 1 category.
+```
