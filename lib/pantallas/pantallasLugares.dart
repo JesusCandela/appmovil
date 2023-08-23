@@ -73,7 +73,7 @@ class _pantallaLugaresState extends State<pantallaLugares> {
                     );
                   });
             } else {
-              return Center(
+              return const  Center(
                 child: Text("NO EXISTEN EMPRESAS"),
               );
             }

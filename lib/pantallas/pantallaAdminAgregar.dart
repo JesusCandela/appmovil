@@ -70,8 +70,7 @@ class _pantallaAdminAgregarState extends State<pantallaAdminAgregar> {
         title: const Text("INSERTAR EMPRESA"),
       ),
       body: Container(
-        decoration: const BoxDecoration(
-            gradient: LinearGradient(colors: [Colors.amber, Colors.blue])),
+        color: Colors.grey[400],
         child: ListView(
           scrollDirection: Axis.vertical,
           children: [
@@ -128,21 +127,27 @@ class _pantallaAdminAgregarState extends State<pantallaAdminAgregar> {
                     ),
 
                 
-                DropdownButtonFormField(
-                  items: _listarutas,
-                  value: _rutaelegida,
-                  decoration: const InputDecoration(hintText: "Seleccione  una ruta"),
-                  onChanged: (valor) {
-                    setState(() {
-                      _rutaelegida = valor;
-                    });
-                  },
+                Container(
+                  color: Colors.amber[100],
+                  child: DropdownButtonFormField(
+                    focusColor: Colors.amberAccent[100],
+                    dropdownColor: Colors.blue[100],
+                    items: _listarutas,
+                    value: _rutaelegida,
+                    decoration: const InputDecoration(hintText: "Seleccione  una ruta",  ),
+                    onChanged: (valor) {
+                      setState(() {
+                        _rutaelegida = valor;
+                      });
+                    },
+                  ),
                 ),
                 (__path == null)
                     ? Container()
                     : Image.file(
                         File(__path),
-                        width: 200,
+                        width: 150,
+                        height: 200,
                       ),
                 ElevatedButton(
                   onPressed: () async {
@@ -152,21 +157,31 @@ class _pantallaAdminAgregarState extends State<pantallaAdminAgregar> {
                     setState(() {
                       __path = _archivo.path;
                     });
-                    style:
-                    ElevatedButton.styleFrom(
-                      primary: Colors.amber[100],
-                    );
+                    
 
                     List b = await File(__path).readAsBytesSync();
                     _image64_1 = base64.encode(b);
                   },
-                  child: const Text("SELECCIONAR FOTO DE LA EMPRESA"),
+                  style:
+                    ElevatedButton.styleFrom(
+                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+                      primary: Colors.green,
+                    ),
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: const [
+                      Icon(Icons.image),
+                      SizedBox(width: 8,),
+                       Text("SELECCIONAR FOTO DE LA EMPRESA"),
+                    ],
+                  ),
                 ),
                 (_path == null)
                     ? Container()
                     : Image.file(
                         File(_path),
-                        width: 150,
+                        width: 100,
+                        height: 150,
                       ),
                 ElevatedButton(
                   onPressed: () async {
@@ -176,21 +191,42 @@ class _pantallaAdminAgregarState extends State<pantallaAdminAgregar> {
                     setState(() {
                       _path = _archivo.path;
                     });
-                    style:
-                    ElevatedButton.styleFrom(
-                      primary: Colors.green[100],
-                    );
+                    
 
                     List b = await File(_path).readAsBytesSync();
                     _image64 = base64.encode(b);
                   },
-                  child: const Text("SELECCIONAR LOGO DE LA EMPRESA"),
+                  style:
+                    ElevatedButton.styleFrom(
+                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+                      primary: Colors.green,
+                    ),
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: const [
+                      Icon(Icons.image),
+                      SizedBox(width: 8,),
+                      Text("SELECCIONAR LOGO DE LA EMPRESA"),
+                    ],
+                  ),
                 ),
                 ElevatedButton(
                   onPressed: () async {
                     _enviarFormulario();
                   },
-                  child: const Text("ENVIAR FORMULARIO"),
+                  style: ElevatedButton.styleFrom(
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(20),
+                    ),
+                  ),
+                  child:  Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: const [
+                      Icon(Icons.send_and_archive),
+                      SizedBox(width: 8,),
+                      Text("ENVIAR FORMULARIO"),
+                    ],
+                  ),
                 ),
               ],
             ),
@@ -210,7 +246,7 @@ class _pantallaAdminAgregarState extends State<pantallaAdminAgregar> {
       'urlfoto': _image64_1,
       'urllogo': _image64,
     };
-    var respuesta = await Api().agregarData(data, "empresas");
+    var respuesta = await Api().agregarData(data, "empresasapi");
     var contenido = json.decode(respuesta.body);
     if (contenido['success'] != null) {
       print(contenido.toString());
@@ -219,8 +255,11 @@ class _pantallaAdminAgregarState extends State<pantallaAdminAgregar> {
           contenido['empresa']['title'],
           contenido['empresa']['razonsocial'],
           contenido['empresa']['descripcion'],
+          contenido['empresa']['latitud'],
+          contenido['empresa']['longitud'],
           contenido['empresa']['urlfoto'],
           contenido['empresa']['urllogo'],
+          contenido['empresa']['likes'],
           contenido['empresa']['ruta_id'],
           contenido['empresa']['user_id']));
 

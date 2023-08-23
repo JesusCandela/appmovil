@@ -4,7 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:apptour/api/Api.dart';
 import 'package:apptour/pantallas/pantallaRegistro.dart';
-import '';
+
 
 class pantallaLogin extends StatefulWidget {
   const pantallaLogin({Key key}) : super(key: key);

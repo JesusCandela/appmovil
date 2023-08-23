@@ -15,6 +15,7 @@ class pantallaEmpresas extends StatefulWidget {
 
 class _pantallaEmpresasState extends State<pantallaEmpresas> {
   Ruta ruta;
+  int _hoveredIndex = -1;
 
   _pantallaEmpresasState(this.ruta);
   @override
@@ -24,71 +25,83 @@ class _pantallaEmpresasState extends State<pantallaEmpresas> {
         title: Text("Empresas En " + ruta.nombre),
       ),
       backgroundColor: Colors.amber,
-      body: Container(
-        child: FutureBuilder(
-          future: basededatos.obtenerEmpresas("ruta_id=" + ruta.id.toString()),
-          builder: (BuildContext c, AsyncSnapshot s) {
-            if (s.hasData) {
-              return ListView.builder(
-                  itemCount: s.data == null ? 0 : s.data.length,
-                  itemBuilder: (_c, _i) {
-                    return GestureDetector(
-                      onTap: () {
-                        Navigator.of(context).push(MaterialPageRoute(
-                            builder: (BuildContext) =>
-                                pantallaEmpresa(s.data[_i])));
-                      },
+      body: FutureBuilder(
+        future: basededatos.obtenerEmpresas("ruta_id=" + ruta.id.toString()),
+        builder: (BuildContext c, AsyncSnapshot s) {
+          if (s.hasData) {
+            return ListView.builder(
+                itemCount: s.data == null ? 0 : s.data.length,
+                itemBuilder: (_c, _i) {
+                  return GestureDetector(
+                    onTap: () {
+                      Navigator.of(context).push(MaterialPageRoute(
+                          builder: (BuildContext) =>
+                              pantallaEmpresa(s.data[_i])));
+                    },
+                    onTapDown: (_) {
+                      setState(() {
+                        _hoveredIndex = _i;
+                      });
+                    },
+                    onTapCancel: () {
+                      setState(() {
+                        _hoveredIndex = -1;
+                      });
+                    },
+                    child: Transform.scale(
+                      scale: _hoveredIndex == _i ? 1.05 : 1.0,
                       child: Card(
-                        
-                        color: Colors.grey[200],
-                        elevation: 10,
-                        margin: const EdgeInsets.all(10),
-                        child: Container(
-                            decoration: const BoxDecoration(image: DecorationImage(image: AssetImage("assets/p4.jpg"), fit: BoxFit.cover) ),
+                        elevation: _hoveredIndex == _i ? 80 : 5,
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(10),
+                        ),
+                        margin: EdgeInsets.all(5),
+                        color: _hoveredIndex == _i
+                            ? Colors.greenAccent // Color cuando está en "hover"
+                            : Colors.white70, // Color normal
 
-                          child: SingleChildScrollView(
-                            scrollDirection: Axis.horizontal,
-                            child: Row(
-                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                              children: [
-                                Image.network(
-                                  "${url}img/empresa/" + s.data[_i].urllogo,
-                                  width: 120,
-                                  height: 120,
-                                  fit: BoxFit.cover,
-                                ),
-                                Padding(
-                                  padding: const EdgeInsets.all(10),
-                                  child: Text(
-                                    s.data[_i].razonsocial,
-                                    textAlign: TextAlign.justify,
-                                    style: const TextStyle(
-                                      fontSize: 20,
-                                      fontWeight: FontWeight.w700,
-                                      color: Colors.black54,
-                                    ),
+                        child: SingleChildScrollView(
+                          scrollDirection: Axis.horizontal,
+                          child: Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            children: [
+                              Image.network(
+                                "${url}img/empresa/" + s.data[_i].urllogo,
+                                width: 120,
+                                height: 120,
+                                fit: BoxFit.cover,
+                              ),
+                              Padding(
+                                padding: const EdgeInsets.all(10),
+                                child: Text(
+                                  s.data[_i].razonsocial,
+                                  textAlign: TextAlign.justify,
+                                  style: const TextStyle(
+                                    fontSize: 20,
+                                    fontWeight: FontWeight.w700,
+                                    color: Colors.black54,
                                   ),
-                                )
-                              ],
-                            ),
+                                ),
+                              )
+                            ],
                           ),
                         ),
                       ),
-                    );
-                  });
-            } else if (s.hasError) {
-              return const Center(
-                child: Text("NO EXISTEN EMPRESAS"),
-              );
-            } else {
-              return const Center(
-                child: CircularProgressIndicator(
-                  color: Colors.green,
-                ),
-              );
-            }
-          },
-        ),
+                    ),
+                  );
+                });
+          } else if (s.hasError) {
+            return const Center(
+              child: Text("NO EXISTEN EMPRESAS"),
+            );
+          } else {
+            return const Center(
+              child: CircularProgressIndicator(
+                color: Colors.green,
+              ),
+            );
+          }
+        },
       ),
     );
   }

@@ -7,7 +7,7 @@ class MapScreen extends StatefulWidget {
   final double destinationLat;
   final double destinationLong;
 
-  MapScreen(
+   MapScreen(
       {this.destinationAddress, this.destinationLat, this.destinationLong});
 
   @override
@@ -22,31 +22,28 @@ class _MapScreenState extends State<MapScreen> {
     return Scaffold(
       appBar: AppBar(title: Text(widget.destinationAddress)),
       body: SingleChildScrollView(
-        child: Column(
-          children: <Widget>[
-            Container(
-              height: MediaQuery.of(context).size.height,
-              width: MediaQuery.of(context).size.width,
-              child: GoogleMap(
-                onMapCreated: (GoogleMapController controller) {
-                  mapController = controller;
-                },
-                initialCameraPosition: CameraPosition(
-                    target:
-                        LatLng(widget.destinationLat, widget.destinationLong),
-                    zoom: 14.0),
-                markers: {
-                  Marker(
-                      markerId: MarkerId(widget.destinationAddress),
-                      position:
-                          LatLng(widget.destinationLat, widget.destinationLong),
-                      infoWindow: InfoWindow(
-                          title: widget.destinationAddress,
-                          snippet: widget.destinationAddress))
-                },
-              ),
-            ),
-          ],
+        child: Container(
+          padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 40) ,
+          height: MediaQuery.of(context).size.height,
+          width: MediaQuery.of(context).size.width,
+          child: GoogleMap(
+            onMapCreated: (GoogleMapController controller) {
+              mapController = controller;
+            },
+            initialCameraPosition: CameraPosition(
+                target:
+                    LatLng(widget.destinationLat, widget.destinationLong),
+                zoom: 14.0),
+            markers: {
+              Marker(
+                  markerId: MarkerId(widget.destinationAddress),
+                  position:
+                      LatLng(widget.destinationLat, widget.destinationLong),
+                  infoWindow: InfoWindow(
+                      title: widget.destinationAddress,
+                      snippet: widget.destinationAddress))
+            },
+          ),
         ),
       ),
       floatingActionButton: FloatingActionButton(

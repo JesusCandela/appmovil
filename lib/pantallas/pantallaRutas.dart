@@ -5,14 +5,17 @@ import 'package:apptour/basededatos/Empresa.dart';
 import 'package:apptour/basededatos/Foto.dart';
 import 'package:apptour/basededatos/Lugar.dart';
 import 'package:apptour/basededatos/Ruta.dart';
+import 'package:apptour/basededatos/Video.dart';
 import 'package:apptour/pantallas/pantallaEmpresas.dart';
 import 'package:apptour/pantallas/pantallaRegistro.dart';
 import 'package:apptour/pantallas/pantallaLugares.dart';
 import 'package:apptour/api/help.dart';
+import 'package:apptour/pantallas/pantallaRuta.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:apptour/pantallas/pantallaLogin.dart';
 import 'package:flutter/rendering.dart';
+import 'package:flutter_spinkit/flutter_spinkit.dart';
 
 var basededatos = DBmanager();
 
@@ -23,6 +26,7 @@ class pantallaRutas extends StatefulWidget {
 
 class _pantallaRutasState extends State<pantallaRutas> {
   bool descargacompleta = false;
+  int _hoveredIndex = -1;
 
   //Cargar datos a base de datos local
   void obtenerJson() async {
@@ -32,9 +36,16 @@ class _pantallaRutasState extends State<pantallaRutas> {
       // ruta
       basededatos.borrarTabla("ruta");
       for (var registro in body['listarutas']) {
-        Ruta ruta =
-            Ruta(registro['id'], registro['nombre'], registro['urlfoto']);
+        Ruta ruta = Ruta(registro['id'], registro['nombre'],
+            registro['urlfoto'], registro['descripcion'], registro['likes']);
         basededatos.insertarRuta(ruta);
+      }
+      basededatos.borrarTabla("video");
+      for (var registro in body['listavideo']) {
+        Video video = Video(registro['id'], registro['titulo'],
+            registro['url_video'], registro['empresa_id']);
+        basededatos.insertarVideo(video);
+        print("video" + video.toString());
       }
       // empresa
       basededatos.borrarTabla("empresa");
@@ -44,8 +55,11 @@ class _pantallaRutasState extends State<pantallaRutas> {
             Data['title'],
             Data['razonsocial'],
             Data['descripcion'],
+            Data['latitud'],
+            Data['longitud'],
             Data['urlfoto'],
             Data['urllogo'],
+            Data['likes'],
             Data['ruta_id'],
             Data['user_id']);
         basededatos.insertarEmpresa(empresa);
@@ -61,6 +75,7 @@ class _pantallaRutasState extends State<pantallaRutas> {
             Data['urlfoto'],
             Data['latitud'],
             Data['longitud'],
+            Data['likes'],
             Data['ruta_id']);
         basededatos.insertarLugar(lugar);
       }
@@ -69,7 +84,7 @@ class _pantallaRutasState extends State<pantallaRutas> {
       basededatos.borrarTabla("foto");
       for (var Data in body['listafotos']) {
         Foto foto = Foto(Data['id'], Data['nombre'], Data['urlfoto'],
-            Data['tipo'], Data['lugar_id']);
+            Data['tipo'], Data['empresa_id'], Data['lugar_id'], Data['likes']);
         basededatos.insertarFoto(foto);
       }
 
@@ -92,18 +107,18 @@ class _pantallaRutasState extends State<pantallaRutas> {
     return Scaffold(
       appBar: AppBar(
         backgroundColor: Colors.green,
-        title: Text("RUTAS"),
+        title: const Text("RUTAS"),
         actions: <Widget>[
-  IconButton(
-    icon: Icon(Icons.refresh),
-    onPressed: () {
-      setState(() {
-        descargacompleta = false;
-      });
-      obtenerJson();
-    },
-  ),
-],
+          IconButton(
+            icon: const Icon(Icons.refresh),
+            onPressed: () {
+              setState(() {
+                descargacompleta = false;
+              });
+              obtenerJson();
+            },
+          ),
+        ],
       ),
       backgroundColor: Colors.amber,
       body: Container(
@@ -117,62 +132,99 @@ class _pantallaRutasState extends State<pantallaRutas> {
                           itemCount:
                               snapshot.data == null ? 0 : snapshot.data.length,
                           itemBuilder: (_c, _i) {
-                            return Card(
-                              elevation: 20,
-                              margin: EdgeInsets.all(5),
-                              child: Row(
-                                mainAxisAlignment:
-                                    MainAxisAlignment.spaceBetween,
-                                children: [
-                                  Image.network(
-                                    "${url}img/ruta/" +
-                                        snapshot.data[_i].urlfoto,
-                                    width: 155,
-                                    height: 100,
-                                    fit: BoxFit.cover,
+                            return GestureDetector(
+                              onTap: () {
+                                Navigator.of(context).push((MaterialPageRoute(
+                                    builder: (BuildContext) =>
+                                        pantallaRuta(snapshot.data[_i]))));
+                              },
+                              onTapDown: (_) {
+                                setState(() {
+                                  _hoveredIndex = _i;
+                                });
+                              },
+                              onTapCancel: () {
+                                setState(() {
+                                  _hoveredIndex = -1;
+                                });
+                              },
+                              child: Transform.scale(
+                                scale: _hoveredIndex == _i ? 1.05 : 1.0,
+                                child: Card(
+                                  elevation: _hoveredIndex == _i ? 80 : 5,
+                                  shape: RoundedRectangleBorder(
+                                    borderRadius: BorderRadius.circular(10),
                                   ),
-                                  Column(
+                                  margin: const EdgeInsets.all(5),
+                                  color: _hoveredIndex == _i
+                                      ? Colors
+                                          .greenAccent // Color cuando está en "hover"
+                                      : Colors.white70, // Color normal
+                                  child: Row(
+                                    mainAxisAlignment:
+                                        MainAxisAlignment.spaceBetween,
                                     children: [
                                       Padding(
-                                        padding: const EdgeInsets.all(10),
-                                        child: Text(
-                                          snapshot.data[_i].nombre,
-                                          style: const TextStyle(
-                                              fontWeight: FontWeight.w900,
-                                              fontSize: 18,
-                                              color: Colors.green),
+                                        padding: const EdgeInsets.symmetric(
+                                            horizontal: 5, vertical: 4),
+                                        child: Image.network(
+                                          "${url}img/ruta/" +
+                                              snapshot.data[_i].urlfoto,
+                                          width: 147,
+                                          height: 93,
+                                          fit: BoxFit.cover,
                                         ),
                                       ),
-                                      Row(
-                                        children: [
-                                          ElevatedButton(
-                                              child: const Text("Empresas"),
-                                              onPressed: () {
-                                                Navigator.of(context).push(
-                                                    MaterialPageRoute(
-                                                        builder: (BuildContext) =>
-                                                            pantallaEmpresas(
-                                                                snapshot.data[
-                                                                    _i])));
-                                              }),
-                                          const SizedBox(
-                                            width: 5,
-                                          ),
-                                          ElevatedButton(
-                                              child: const Text("Lugares"),
-                                              onPressed: () {
-                                                Navigator.of(context).push(
-                                                    MaterialPageRoute(
-                                                        builder: (BuildContext) =>
-                                                            pantallaLugares(
-                                                                snapshot.data[
-                                                                    _i])));
-                                              })
-                                        ],
+                                      Expanded(
+                                        child: Column(
+                                          children: [
+                                            Padding(
+                                              padding: const EdgeInsets.all(10),
+                                              child: Text(
+                                                snapshot.data[_i].nombre,
+                                                style: const TextStyle(
+                                                    fontWeight: FontWeight.w900,
+                                                    fontSize: 18,
+                                                    color: Colors.green),
+                                              ),
+                                            ),
+                                            Row(
+                                              mainAxisAlignment:
+                                                  MainAxisAlignment.center,
+                                              children: [
+                                                ElevatedButton(
+                                                    child:
+                                                        const Text("Empresas"),
+                                                    onPressed: () {
+                                                      Navigator.of(context).push(
+                                                          MaterialPageRoute(
+                                                              builder: (BuildContext) =>
+                                                                  pantallaEmpresas(
+                                                                      snapshot.data[
+                                                                          _i])));
+                                                    }),
+                                                const SizedBox(
+                                                  width: 5,
+                                                ),
+                                                ElevatedButton(
+                                                    child:
+                                                        const Text("Lugares"),
+                                                    onPressed: () {
+                                                      Navigator.of(context).push(
+                                                          MaterialPageRoute(
+                                                              builder: (BuildContext) =>
+                                                                  pantallaLugares(
+                                                                      snapshot.data[
+                                                                          _i])));
+                                                    })
+                                              ],
+                                            )
+                                          ],
+                                        ),
                                       )
                                     ],
-                                  )
-                                ],
+                                  ),
+                                ),
                               ),
                             );
                           });
@@ -180,19 +232,20 @@ class _pantallaRutasState extends State<pantallaRutas> {
                       return const Center(child: Text("NO EXISTE INFORMACION"));
                     } else {
                       return const Center(
-                        child: CircularProgressIndicator(
-                          backgroundColor: Colors.lightBlue,
-                        ),
-                      );
+                          child: Padding(
+                              padding: EdgeInsets.all(20.0),
+                              child: SpinKitFadingCircle(
+                                color: Colors.lightBlue,
+                                size: 50.0,
+                              )));
                     }
                   })
               : const Center(
                   child: Padding(
                     padding: EdgeInsets.all(20.0),
-                    child: LinearProgressIndicator(
-                      minHeight: 10.0,
-                      semanticsLabel: "Cargando información",
-                      backgroundColor: Colors.lightBlue,
+                    child: SpinKitFoldingCube(
+                      color: Colors.blue,
+                      size: 200,
                     ),
                   ),
                 )),

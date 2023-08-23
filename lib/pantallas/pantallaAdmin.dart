@@ -6,6 +6,7 @@ import 'package:apptour/pantallas/pantallaAdminEditar.dart';
 import 'package:apptour/pantallas/pantallaLogin.dart';
 import 'package:apptour/pantallas/pantallaRutas.dart';
 import 'package:flutter/material.dart';
+import 'package:marquee/marquee.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 var basededatos = DBmanager();
@@ -77,7 +78,7 @@ class _pantallaAdminState extends State<pantallaAdmin> {
                     builder: (c, s) {
                       if ((s.hasData) && (s.data.length > 0)) {
                         return Padding(
-                            padding: const EdgeInsets.all(20),
+                            padding: const EdgeInsets.all(10),
                             child: ListView.builder(
                                 itemCount: s.data == null ? 0 : s.data.length,
                                 itemBuilder: (_c, _i) {
@@ -96,15 +97,26 @@ class _pantallaAdminState extends State<pantallaAdmin> {
                                       mainAxisAlignment:
                                           MainAxisAlignment.spaceBetween,
                                       children: [
-                                        Text(
-                                           s.data[_i].razonsocial.length >=10 ? s.data[_i].razonsocial.substring(0,10)
-                                           : s.data[_i].razonsocial
-                                              ,
-                                          textAlign: TextAlign.center,
+                                        Padding(
+                                          padding: const EdgeInsets.all(2.0),
+                                          child: SizedBox(
+                                    height: 60,
+                                    width: 120,
+                                    child: Marquee(
+                                      text: s.data[_i].razonsocial, // El texto que quieres mostrar
+                                      style: const TextStyle(
+                                        fontSize: 20,
+                                        fontWeight: FontWeight.w700,
+                                        color: Colors.green,
+                                      ),
+                                      blankSpace:
+                                          90, // Espacio en blanco al final del texto antes de reiniciar
+                                      velocity:
+                                          50, // Velocidad de desplazamiento en pixels por segundo
+                                    ),
+                                  ),
                                         ),
-                                        const SizedBox(
-                                          width: 5,
-                                        ),
+                                       
                                         ElevatedButton(
                                           style: ElevatedButton.styleFrom(
                                               shape: RoundedRectangleBorder(
@@ -120,9 +132,7 @@ class _pantallaAdminState extends State<pantallaAdmin> {
                                           },
                                           child: const Text("EDITAR"),
                                         ),
-                                        const SizedBox(
-                                          width: 5,
-                                        ),
+                                        
                                         ElevatedButton(
                                           style: ElevatedButton.styleFrom(
                                               shape: RoundedRectangleBorder(
@@ -194,7 +204,7 @@ class _pantallaAdminState extends State<pantallaAdmin> {
     // validacion
     var respuesta = await Api().logout("logout");
     var contenido = json.decode(respuesta.body);
-    if (contenido['success']!=null) {
+    if (contenido['success'] != null) {
       SharedPreferences logout = await SharedPreferences.getInstance();
       logout.remove("token");
       logout.remove("user");
@@ -225,6 +235,7 @@ class _pantallaAdminState extends State<pantallaAdmin> {
   void _eliminarEmpresa(id) async {
     var respuesta = await Api().borrarData("empresas", id.toString());
     var contenido = json.decode(respuesta.body);
+    checkSession();
 
     if (contenido['success']) {
       print(contenido.toString());

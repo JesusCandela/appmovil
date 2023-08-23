@@ -1,62 +1,54 @@
-import 'dart:ui';
 import 'dart:ffi';
 import 'package:flutter_widget_from_html/flutter_widget_from_html.dart';
 import 'package:http/http.dart' as http;
 import 'package:apptour/basededatos/DBmanager.dart';
-import 'package:apptour/basededatos/Lugar.dart';
-import 'package:apptour/pantallas/PantallaFoto.dart';
+import 'package:apptour/basededatos/Ruta.dart';
 import 'package:apptour/api/help.dart';
 import 'package:flutter/material.dart';
-import 'package:apptour/pantallas/pantallaportadagps.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
-import 'package:url_launcher/url_launcher.dart';
 import 'package:apptour/pantallas/MapScreen.dart';
-import 'package:carousel_slider/carousel_slider.dart';
 
 import 'package:expandable_text/expandable_text.dart';
 
 var basededatos = new DBmanager();
 
-class pantallaLugar extends StatefulWidget {
-  Lugar lugar;
-  pantallaLugar(this.lugar);
+class pantallaRuta extends StatefulWidget {
+  Ruta ruta;
+  pantallaRuta(this.ruta);
 
   @override
-  _pantallaLugarState createState() => _pantallaLugarState(this.lugar);
+  _pantallaRutaState createState() => _pantallaRutaState(this.ruta);
 }
 
-class _pantallaLugarState extends State<pantallaLugar> {
+class _pantallaRutaState extends State<pantallaRuta> {
   GoogleMapController mapController;
   String _destinationsAddress;
   String _destinationsLat;
   String _destinationsLong;
-  Lugar _lugar;
-  _pantallaLugarState(this._lugar);
+  Ruta _ruta;
+  _pantallaRutaState(this._ruta);
   int _likes = 0;
   bool _isLiked = false;
-  bool _expanded = false;
   var db = DBmanager();
+  bool _expanded = false;
   @override
   void initState() {
     super.initState();
-    _lugar = widget.lugar;
-    _destinationsLat = _lugar.latitud;
-    _destinationsLong = _lugar.longitud;
-    _likes = _lugar.likes;
-    _destinationsAddress = _lugar.nombre;
+    _ruta = widget.ruta;
+    _likes = _ruta.likes;
   }
 
-  Future<Void> _incrementLikes(int lugarId) async {
+  Future _incrementLikes(int rutaId) async {
     var db = DBmanager();
     // Incrementa el contador de likes en la base de datos y se cambia  el estado local
     _likes++;
     _isLiked = true;
-    await db.actualizarLikesLugar(_likes, lugarId);
+    await db.actualizarLikesRuta(_likes, rutaId);
     setState(() {});
     // Realiza una solicitud POST al servidor
     final response = await http.post(
       Uri.parse(
-          'http://192.168.100.39/appturismo/public/api/increment-likeslugar/$lugarId'),
+          'http://192.168.100.39/appturismo/public/api/increment-likesruta/$rutaId'),
     );
 
     if (response.statusCode == 200) {
@@ -69,7 +61,7 @@ class _pantallaLugarState extends State<pantallaLugar> {
   }
 
   @override
-  Widget build(BuildContext context) {
+ Widget build(BuildContext context) {
     return Scaffold(
       floatingActionButton: Container(
         width: double.infinity,
@@ -81,7 +73,7 @@ class _pantallaLugarState extends State<pantallaLugar> {
                       onPressed: _isLiked
                           ? null
                           : () async {
-                              await _incrementLikes(_lugar.id);
+                              await _incrementLikes(_ruta.id);
                             },
                       icon: _isLiked
                           ? const Icon(
@@ -98,7 +90,7 @@ class _pantallaLugarState extends State<pantallaLugar> {
           
                 FutureBuilder(
                   future:
-                      basededatos.obtenerLugares("id=" + _lugar.id.toString()),
+                      basededatos.obtenerRutas("id=" + _ruta.id.toString()),
                   builder: (c, s) {
                     if (s.hasData) {
                       return FloatingActionButton(
@@ -130,7 +122,7 @@ class _pantallaLugarState extends State<pantallaLugar> {
     
            
         appBar: AppBar(
-          title: Text(_lugar.nombre),
+          title: Text(_ruta.nombre),
         ),
         body: Container(
           height: 1000,
@@ -147,7 +139,7 @@ class _pantallaLugarState extends State<pantallaLugar> {
                   border: Border.all( color: Colors.black12,width: 5.0, style: BorderStyle.solid),
                     shape: BoxShape.rectangle,
                     ),
-                  child: Image.network("${url}img/lugar/" + _lugar.urlfoto, 
+                  child: Image.network("${url}img/ruta/" + _ruta.urlfoto, 
                       height: 200, width: 500,
                       fit: BoxFit.cover),
                 ),
@@ -156,7 +148,7 @@ class _pantallaLugarState extends State<pantallaLugar> {
                   margin: const EdgeInsets.all(10),
                   child: _expanded
                     ? HtmlWidget(
-                        _lugar.descripcion,
+                        _ruta.descripcion,
                         textStyle: const TextStyle(
                           height:
                               1.5, // Ajusta el espaciado entre líneas para justificar el texto
@@ -164,8 +156,8 @@ class _pantallaLugarState extends State<pantallaLugar> {
                       )
                     : HtmlWidget(
                         _expanded
-                            ? _lugar.descripcion
-                            : _lugar.descripcion.split('\n').take(1).join('\n'),
+                            ? _ruta.descripcion
+                            : _ruta.descripcion.split('\n').take(1).join('\n'),
                         textStyle: const TextStyle(
                           height:
                               1.5, // Ajusta el espaciado entre líneas para justificar el texto
@@ -187,71 +179,7 @@ class _pantallaLugarState extends State<pantallaLugar> {
                   ),
                 ),
               ),
-                FutureBuilder(
-                  future: basededatos
-                      .obtenerFotos("lugar_id=" + _lugar.id.toString()),
-                  builder: (context, snapshot) {
-                    if (snapshot.connectionState == ConnectionState.waiting) {
-                      return const CircularProgressIndicator();
-                    } else if (snapshot.hasError) {
-                      return const Text("Error al cargar las fotos");
-                    } else if (!snapshot.hasData || snapshot.data.isEmpty) {
-                      return const Center(child: const Text("No hay fotos"));
-                    } else {
-                      return CarouselSlider(
-                        options: CarouselOptions(
-                          viewportFraction: 0.8,
-                          aspectRatio: 16 / 9,
-                          autoPlay: true,
-                          enlargeCenterPage: true,
-                          autoPlayCurve: Curves.fastOutSlowIn,
-                          enableInfiniteScroll: true,
-                          autoPlayAnimationDuration:
-                              const Duration(milliseconds: 800),
-                          onPageChanged: (index, reason) {
-                            // Manejar el cambio de página (opcional)
-                          },
-                        ),
-                        items: snapshot.data.map<Widget>((item) {
-                          return Padding(
-                            padding: const EdgeInsets.all(10.0),
-                            child: Container(
-                              height: 400,
-                              decoration: BoxDecoration(
-                                borderRadius: BorderRadius.circular(10.0),
-                                boxShadow: const [
-                                  BoxShadow(
-                                    color: Colors.black38,
-                                    spreadRadius: 2,
-                                    blurRadius: 5,
-                                    offset: Offset(
-                                        0, 3), // changes position of shadow
-                                  ),
-                                ],
-                              ),
-                              child: ClipRRect(
-                                borderRadius: BorderRadius.circular(10.0),
-                                child: Image.network(
-                                  "${url}img/foto/" + item.urlfoto,
-                                  width: 150,
-                                  height: 400,
-                                  fit: BoxFit.cover,
-                                ),
-                              ),
-                            ),
-                          );
-                        }).toList(),
-                      );
-                    }
-                  },
-                ),
-                
-                Text(
-                  " Likes: $_likes",
-                  textAlign: TextAlign.left,
-                  style: const TextStyle(fontWeight: FontWeight.bold),
-                ),
-                
+               
               ],
             ),
           ),

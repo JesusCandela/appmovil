@@ -209,7 +209,7 @@ class _pantallaAdminEditarState extends State<pantallaAdminEditar> {
     }
     ;
     var respuesta =
-        await Api().editarData(data, "empresas", empresa.id.toString());
+        await Api().editarData(data, "empresasapi", empresa.id.toString());
     var contenido = json.decode(respuesta.body);
     if (contenido['success']) {
       print(contenido.toString());
@@ -219,8 +219,11 @@ class _pantallaAdminEditarState extends State<pantallaAdminEditar> {
             contenido['empresa']['title'],
             contenido['empresa']['razonsocial'],
             contenido['empresa']['descripcion'],
+            contenido['empresa']['latitud'],
+            contenido['empresa']['longitud'],
             contenido['empresa']['urlfoto'],
             contenido['empresa']['urllogo'],
+            contenido['empresa']['likes'],
             contenido['empresa']['ruta_id'],
             contenido['empresa']['user_id']),
       );

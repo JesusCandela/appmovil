@@ -1,24 +1,57 @@
 import 'package:flutter/material.dart';
 import 'package:video_player/video_player.dart';
 
-class VideoScreen extends StatefulWidget {
-  const VideoScreen({Key key}) : super(key: key);
+class VideoPlayerPage extends StatefulWidget {
+  final String videoUrl;
+
+  const VideoPlayerPage({this.videoUrl});
 
   @override
-  _VideoScreenState createState() => _VideoScreenState();
+  _VideoPlayerPageState createState() => _VideoPlayerPageState();
 }
 
-class _VideoScreenState extends State<VideoScreen> {
-  VideoPlayerController _controller;
+class _VideoPlayerPageState extends State<VideoPlayerPage> {
+   VideoPlayerController _controller;
 
   @override
   void initState() {
     super.initState();
-    _controller = VideoPlayerController.asset('assets/intro.mp4')
+    _controller = VideoPlayerController.network(widget.videoUrl)
       ..initialize().then((_) {
-        //una vez inicializado el controlador, inicie la reproducción automáticamente
-        _controller.play();
+        // Asegúrate de que el controlador esté inicializado antes de mostrar el video.
+        setState(() {});
       });
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(
+        title: const Text('Reproductor de Video'),
+      ),
+      body: Center(
+        child: _controller.value.isInitialized
+            ? AspectRatio(
+                aspectRatio: _controller.value.aspectRatio,
+                child: VideoPlayer(_controller),
+              )
+            : const CircularProgressIndicator(), // Puedes mostrar un indicador de carga mientras se inicializa el video.
+      ),
+      floatingActionButton: FloatingActionButton(
+        onPressed: () {
+          setState(() {
+            if (_controller.value.isPlaying) {
+              _controller.pause();
+            } else {
+              _controller.play();
+            }
+          });
+        },
+        child: Icon(
+          _controller.value.isPlaying ? Icons.pause : Icons.play_arrow,
+        ),
+      ),
+    );
   }
 
   @override
@@ -26,41 +59,4 @@ class _VideoScreenState extends State<VideoScreen> {
     super.dispose();
     _controller.dispose();
   }
-
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      body: Center(
-        child: _controller.value.isInitialized
-            ? AspectRatio(
-                aspectRatio: _controller.value.aspectRatio,
-                child: VideoPlayer(_controller),
-              )
-            : Container(),
-      ),
-    );
-  }
 }
-
-/* para llamarlo 
-class MyApp extends StatelessWidget {
-  @override
-  Widget build(BuildContext context) {
-    return MaterialApp(
-      title: 'Mi aplicación',
-      home: Scaffold(
-        body: Center(
-          child: ElevatedButton(
-            onPressed: () {
-              Navigator.push(
-                context,
-                MaterialPageRoute(builder: (context) => VideoScreen()),
-              );
-            },
-            child: Text('Reproducir video'),
-          ),
-        ),
-      ),
-    );
-  }
-} */
